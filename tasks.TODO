@@ -1,0 +1,263 @@
+API Bancária com Typescript:
+  MVP:
+    ✔ Planejamento (TODO) @done(22-06-25 14:21)
+    Configuração do projeto:
+      Estrutura de diretórios:
+        ✔ clients/dao/postgres @done(22-06-25 14:22)
+        ✔ config @done(22-06-25 14:23)
+        ✔ controllers @done(22-06-25 14:23)
+        ✔ models @done(22-06-25 14:23)
+        ✔ routes @done(22-06-25 14:23)
+        ✔ services @done(22-06-25 14:23)
+        ✔ utils @done(22-06-25 14:23)
+        ✔ validators @done(22-06-25 14:23)
+      Instalação das dependencias:
+        dependencias de produção:
+          ✔ dotenv @done(22-06-25 14:27)
+          ✔ express @done(22-06-25 14:27)
+          ✔ pg @done(22-06-25 14:27)
+          ✔ uuid @done(22-06-25 14:28)
+        dependencias de desenvolvimento:
+          ✔ @types/dotenv @done(22-06-25 14:28)
+          ✔ @types/express @done(22-06-25 14:28)
+          ✔ @types/node @done(22-06-25 14:28)
+          ✔ @types/pg @done(22-06-25 14:28)
+          ✔ @types/uuid @done(22-06-25 14:28)
+          ✔ typescript @done(22-06-25 14:28)
+          ✔ ts-node-dev @done(22-06-25 14:28)
+          ✔ eslint @done(22-06-25 14:28)
+      ✔ criação do .gitignore @done(22-06-25 14:24)
+      ✔ Typescript configuração @done(22-06-25 14:49)
+      ✔ Eslint Configuração @done(22-06-25 15:13)
+      ✔ Criação dos scripts do package.json @done(22-06-25 15:35)
+      ☐ Repositório remoto
+      ✔ Variáveis de ambiente @done(22-06-25 16:00)
+    Codificação:
+      models:
+        ☐ response
+        ☐ user
+        ☐ account
+        ☐ transaction
+      controllers:
+        ☐ create-account
+        ☐ get-extract
+        ☐ create-deposit
+        ☐ create-transfer
+        ☐ create-draft
+      services:
+        ☐ create-account
+        ☐ get-extract
+        ☐ create-deposit
+        ☐ create-transfer
+        ☐ create-draft
+      validators:
+        user:
+          ☐ name
+          ☐ birtdate
+          ☐ document (cpf)
+          ☐ accountPassword
+        account:
+          ☐ agencyNumber
+          ☐ agencyVerificationCode
+          ☐ accountNumber
+          ☐ accountVerificationCode
+        transaction:
+          ☐ type (para validar se é transfer | draft | deposit)
+          ☐ value (tem que ser um número de não pode ser negativo quando vem pelo body)
+      config:
+        ☐ basicamente arquivo index.ts q exporta as variáveis de ambiente para centralizar seu acesso
+      utils:
+        ☐ response-writer
+        ☐ exception-treatment
+      clients/dao/postgres:
+        ☐ users
+        ☐ accounts
+        ☐ transactions
+    Modelagem Tabelas:
+      Users:
+        ☐ id
+        ☐ name
+        ☐ birthdate
+        ☐ document
+      Accounts:
+        ☐ id
+        ☐ user_id
+        ☐ agencyNumber
+        ☐ agencyVerificationCode
+        ☐ accountNumber
+        ☐ accountVerificationCode
+        ☐ balance
+      Transactions:
+        ☐ id
+        ☐ origin_account_id (nulo se for um deposito)
+        ☐ destination_account_id (nulo se for um saque)
+        ☐ date
+        ☐ value
+        ☐ type
+    Insominia:
+      ☐ configurar ambientes e variáveis
+      endpoints:
+        Get extrated (GET):
+          ☐ URL /extract
+          QUERYS STRINGS (filters):
+            ☐ agencyNumber
+            ☐ agencyVerificationCode
+            ☐ accountNumber
+            ☐ accountVerificationCode
+            ☐ document
+          ☐ RESPONSE: {
+            "data": {
+              "agencyNumber": 4570,
+              "agencyVerificationCode": 8,
+              "accountNumber": 985684,
+              "accountVerificationCode": 7,
+              "owner": 'Anderson,
+              "document": "76763008007",
+              "birthdate": 4570,
+              "balance": 23000.22,
+              "transactions": {
+                "transactionId": "",
+                "type": "transfer"
+                "value": -30,
+                "date": ""
+              }
+            },
+            "messages": null
+          }
+        Make deposit (POST):
+          ☐ URL /desposit
+          ☐ BODY: {
+            "account": {
+              "agencyNumber": 4570,
+              "agencyVerificationCode": 8,
+              "accountNumber": 985684,
+              "accountVerificationCode": 7,
+              "document": "76763008007"
+            }
+            "value": 123.45
+          }
+          ☐ RESPONSE: {
+            "data": {
+              "transactionId": "",
+              "type": "deposit",
+              "value": 15.51,
+              "date": "",
+              "account": {
+                "agencyNumber": 4570,
+                "agencyVerificationCode": 8,
+                "accountNumber": 985684,
+                "accountVerificationCode": 7,
+                "owner": "Anderson",
+                "document": "76763008007"
+              }
+            },
+            "messages": null
+          }
+        Make transfer (POST):
+          ☐ URL /transfer
+          ☐ BODY: {
+            "originAccount": {
+              "agencyNumber": 4570,
+              "agencyVerificationCode": 8,
+              "accountNumber": 985684,
+              "accountVerificationCode": 7,
+              "document": "76763008007",
+              "accountPassword": "2222"
+            },
+            "destinationAccount": {
+              "agencyNumber": 4570,
+              "agencyVerificationCode": 8,
+              "accountNumber": 985684,
+              "accountVerificationCode": 7,
+              "document": "76763008007"
+            },
+            "value": 15.51
+          }
+          ☐ RESPONSE: {
+            "data": {
+              "transactionId": "",
+              "type": "transfer",
+              "value": 15.51,
+              "date": "",
+              "originAccount": {
+                "agencyNumber": 4570,
+                "agencyVerificationCode": 8,
+                "accountNumber": 985684,
+                "accountVerificationCode": 7,
+                "document": "76763008007"
+              },
+              "destinationAccount": {
+                "agencyNumber": 4570,
+                "agencyVerificationCode": 8,
+                "accountNumber": 985684,
+                "accountVerificationCode": 7,
+                "document": "76763008007"
+              },
+            },
+            "messages": null
+          }
+        Make draft (POST):
+          ☐ URL /draft
+          ☐ BODY: {
+            "account": {
+              "agencyNumber": 4570,
+              "agencyVerificationCode": 8,
+              "accountNumber": 985684,
+              "accountVerificationCode": 7,
+              "document": "76763008007",
+              "accountPassword": "2222"
+            }
+            "value": 123.45
+          }
+          ☐ RESPONSE: {
+            "data": {
+              "transactionId": "",
+              "type": "draft",
+              "value": 15.51,
+              "date": "",
+              "account": {
+                "agencyNumber": 4570,
+                "agencyVerificationCode": 8,
+                "accountNumber": 985684,
+                "accountVerificationCode": 7,
+                "owner": "Anderson",
+                "document": "76763008007"
+              }
+            },
+            "messages": null
+          }
+        Create account (POST):
+          ☐ URL /create-account
+          ☐ BODY: {
+            "name": "Anderson Ferreira Alves",
+            "document": "76763008007",
+            "birthdate": "1995-01-31",
+            "accountPassword": "2222"
+          }
+          ☐ RESPONSE: {
+            "data": {
+              "agencyNumber": 4570,
+              "agencyVerificationCode": 8,
+              "accountNumber": 985684,
+              "accountVerificationCode": 7,
+              "owner": "Anderson",
+              "document": "76763008007",
+              "birthdate": 4570
+            },
+            "messages": null
+          }
+  Extras:
+    Uso de transactions:
+      ☐ criação da conta e do usuário
+      ☐ criação de depositos e suas taxas
+      ☐ criação de saques e suas taxas
+    Controle de sessão:
+      ☐ autenticação
+      ☐ autorização
+    Documentação:
+        ☐ Readme.md
+    Docker:
+      docker compose:
+        ☐ imagem do nginx
+        ☐ imagem do node com o projeto
+        ☐ imagem do postgres
