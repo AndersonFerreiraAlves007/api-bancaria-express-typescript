@@ -30,20 +30,20 @@ API Bancária com Typescript:
       ✔ Typescript configuração @done(22-06-25 14:49)
       ✔ Eslint Configuração @done(22-06-25 15:13)
       ✔ Criação dos scripts do package.json @done(22-06-25 15:35)
-      ☐ Repositório remoto
+      ✔ Repositório remoto @done(22-06-25 16:02)
       ✔ Variáveis de ambiente @done(22-06-25 16:00)
     Codificação:
       models:
-        ☐ response
-        ☐ user
-        ☐ account
-        ☐ transaction
+        ✔ response @done(22-06-25 16:53)
+        ✔ user @done(22-06-25 16:53)
+        ✔ account @done(22-06-25 16:53)
+        ✔ transaction @done(22-06-25 16:53)
       controllers:
-        ☐ create-account
-        ☐ get-extract
-        ☐ create-deposit
-        ☐ create-transfer
-        ☐ create-draft
+        ✔ create-account @done(22-06-25 20:58)
+        ✔ get-extract @done(22-06-25 20:58)
+        ✔ create-deposit @done(22-06-25 20:58)
+        ✔ create-transfer @done(22-06-25 20:58)
+        ✔ create-draft @done(22-06-25 20:58)
       services:
         ☐ create-account
         ☐ get-extract
@@ -52,60 +52,61 @@ API Bancária com Typescript:
         ☐ create-draft
       validators:
         user:
-          ☐ name
-          ☐ birtdate
-          ☐ document (cpf)
-          ☐ accountPassword
+          ✔ name @done(22-06-25 20:58)
+          ✔ birtdate @done(22-06-25 20:58)
+          ✔ document (cpf) @done(22-06-25 20:58)
+          ✔ accountPassword @done(22-06-25 20:58)
         account:
-          ☐ agencyNumber
-          ☐ agencyVerificationCode
-          ☐ accountNumber
-          ☐ accountVerificationCode
+          ✔ agencyNumber @done(22-06-25 20:58)
+          ✔ agencyVerificationCode @done(22-06-25 20:58)
+          ✔ accountNumber @done(22-06-25 20:58)
+          ✔ accountVerificationCode @done(22-06-25 20:58)
         transaction:
-          ☐ type (para validar se é transfer | draft | deposit)
-          ☐ value (tem que ser um número de não pode ser negativo quando vem pelo body)
+          ✔ type (para validar se é transfer | draft | deposit) @done(22-06-25 20:58)
+          ✔ value (tem que ser um número de não pode ser negativo quando vem pelo body) @done(22-06-25 20:58)
       config:
-        ☐ basicamente arquivo index.ts q exporta as variáveis de ambiente para centralizar seu acesso
+        ✔ basicamente arquivo index.ts q exporta as variáveis de ambiente para centralizar seu acesso @done(22-06-25 16:25)
       utils:
-        ☐ response-writer
-        ☐ exception-treatment
+        ✔ response-writer @done(22-06-25 16:10)
+        ✔ exception-treatment @done(22-06-25 16:10)
       clients/dao/postgres:
         ☐ users
         ☐ accounts
         ☐ transactions
     Modelagem Tabelas:
       Users:
-        ☐ id
-        ☐ name
-        ☐ birthdate
-        ☐ document
+        ✔ id @done(22-06-25 20:58)
+        ✔ name @done(22-06-25 20:58)
+        ✔ birthdate @done(22-06-25 20:58)
+        ✔ document @done(22-06-25 20:59)
+        ✔ email @done(22-06-25 20:59)
       Accounts:
-        ☐ id
-        ☐ user_id
-        ☐ agencyNumber
-        ☐ agencyVerificationCode
-        ☐ accountNumber
-        ☐ accountVerificationCode
-        ☐ balance
+        ✔ id @done(22-06-25 20:59)
+        ✔ user_id @done(22-06-25 20:59)
+        ✔ agencyNumber @done(22-06-25 20:59)
+        ✔ agencyVerificationCode @done(22-06-25 20:59)
+        ✔ accountNumber @done(22-06-25 20:59)
+        ✔ accountVerificationCode @done(22-06-25 20:59)
+        ✔ balance @done(22-06-25 20:59)
       Transactions:
-        ☐ id
-        ☐ origin_account_id (nulo se for um deposito)
-        ☐ destination_account_id (nulo se for um saque)
-        ☐ date
-        ☐ value
-        ☐ type
+        ✔ id @done(22-06-25 20:59)
+        ✔ origin_account_id (nulo se for um deposito) @done(22-06-25 20:59)
+        ✔ destination_account_id (nulo se for um saque) @done(22-06-25 20:59)
+        ✔ date @done(22-06-25 20:59)
+        ✔ value @done(22-06-25 20:59)
+        ✔ type @done(22-06-25 20:59)
     Insominia:
-      ☐ configurar ambientes e variáveis
+      ✔ configurar ambientes e variáveis @done(22-06-25 21:13)
       endpoints:
         Get extrated (GET):
-          ☐ URL /extract
+          ✔ URL /extract @done(22-06-25 21:13)
           QUERYS STRINGS (filters):
-            ☐ agencyNumber
-            ☐ agencyVerificationCode
-            ☐ accountNumber
-            ☐ accountVerificationCode
-            ☐ document
-          ☐ RESPONSE: {
+            ✔ agencyNumber @done(22-06-25 21:13)
+            ✔ agencyVerificationCode @done(22-06-25 21:13)
+            ✔ accountNumber @done(22-06-25 21:13)
+            ✔ accountVerificationCode @done(22-06-25 21:13)
+            ✔ document @done(22-06-25 21:13)
+          ✔ RESPONSE: { @done(22-06-25 21:13)
             "data": {
               "agencyNumber": 4570,
               "agencyVerificationCode": 8,
@@ -125,8 +126,8 @@ API Bancária com Typescript:
             "messages": null
           }
         Make deposit (POST):
-          ☐ URL /desposit
-          ☐ BODY: {
+          ✔ URL /desposit @done(22-06-25 21:13)
+          ✔ BODY: { @done(22-06-25 21:13)
             "account": {
               "agencyNumber": 4570,
               "agencyVerificationCode": 8,
@@ -136,7 +137,7 @@ API Bancária com Typescript:
             }
             "value": 123.45
           }
-          ☐ RESPONSE: {
+          ✔ RESPONSE: { @done(22-06-25 21:13)
             "data": {
               "transactionId": "",
               "type": "deposit",
@@ -154,8 +155,8 @@ API Bancária com Typescript:
             "messages": null
           }
         Make transfer (POST):
-          ☐ URL /transfer
-          ☐ BODY: {
+          ✔ URL /transfer @done(22-06-25 21:13)
+          ✔ BODY: { @done(22-06-25 21:13)
             "originAccount": {
               "agencyNumber": 4570,
               "agencyVerificationCode": 8,
@@ -173,7 +174,7 @@ API Bancária com Typescript:
             },
             "value": 15.51
           }
-          ☐ RESPONSE: {
+          ✔ RESPONSE: { @done(22-06-25 21:13)
             "data": {
               "transactionId": "",
               "type": "transfer",
@@ -197,8 +198,8 @@ API Bancária com Typescript:
             "messages": null
           }
         Make draft (POST):
-          ☐ URL /draft
-          ☐ BODY: {
+          ✔ URL /draft @done(22-06-25 21:13)
+          ✔ BODY: { @done(22-06-25 21:14)
             "account": {
               "agencyNumber": 4570,
               "agencyVerificationCode": 8,
@@ -209,7 +210,7 @@ API Bancária com Typescript:
             }
             "value": 123.45
           }
-          ☐ RESPONSE: {
+          ✔ RESPONSE: { @done(22-06-25 21:14)
             "data": {
               "transactionId": "",
               "type": "draft",
@@ -227,14 +228,14 @@ API Bancária com Typescript:
             "messages": null
           }
         Create account (POST):
-          ☐ URL /create-account
-          ☐ BODY: {
+          ✔ URL /create-account @done(22-06-25 21:14)
+          ✔ BODY: { @done(22-06-25 21:14)
             "name": "Anderson Ferreira Alves",
             "document": "76763008007",
             "birthdate": "1995-01-31",
             "accountPassword": "2222"
           }
-          ☐ RESPONSE: {
+          ✔ RESPONSE: { @done(22-06-25 21:14)
             "data": {
               "agencyNumber": 4570,
               "agencyVerificationCode": 8,
@@ -246,18 +247,3 @@ API Bancária com Typescript:
             },
             "messages": null
           }
-  Extras:
-    Uso de transactions:
-      ☐ criação da conta e do usuário
-      ☐ criação de depositos e suas taxas
-      ☐ criação de saques e suas taxas
-    Controle de sessão:
-      ☐ autenticação
-      ☐ autorização
-    Documentação:
-        ☐ Readme.md
-    Docker:
-      docker compose:
-        ☐ imagem do nginx
-        ☐ imagem do node com o projeto
-        ☐ imagem do postgres

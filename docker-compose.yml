@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  postgresql:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: 58310502
+    volumes:
+      - postgresData:/var/lib/postgresql/data
+volumes:
+  postgresData:
