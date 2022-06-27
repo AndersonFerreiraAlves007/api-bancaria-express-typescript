@@ -1,4 +1,4 @@
-interface Transfer
+interface TransferBody
 {
   originAccount: {
     agencyNumber: string
@@ -18,4 +18,4 @@ interface Transfer
   value: number
 }
 
-export { Transfer };
+export { TransferBody };

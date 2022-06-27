@@ -1,8 +1,8 @@
 import { PostgresDB } from '.';
-import { Transaction, FiltersTransaction } from '../../../models';
+import { Transaction } from '../../../models';
 
 class TransactionsTable extends PostgresDB {
-  public async insert(transaction: Transaction): Promise<any> {
+  public async insert(transaction: Transaction): Promise<Transaction> {
     try {
       this.client.connect();
 
@@ -29,8 +29,8 @@ class TransactionsTable extends PostgresDB {
         transaction.date,
         transaction.value,
         transaction.type,
-        transaction.originAccountId,
-        transaction.destinationAccountId,
+        transaction.origin_account_id,
+        transaction.destination_account_id,
       ]);
 
       this.client.end();
@@ -39,15 +39,14 @@ class TransactionsTable extends PostgresDB {
         return result.rows[0];
       }
 
-      return null;
+      throw new Error('503: service temporarily unavailable');
     } catch (error) {
-      console.log(error)
       this.client.end();
       throw new Error('503: service temporarily unavailable');
     }
   }
 
-  public async list(filters: Partial<FiltersTransaction>): Promise<Transaction[]> {
+  public async list(filters: Partial<Transaction>): Promise<Transaction[]> {
     try {
       this.client.connect();
 
@@ -79,8 +78,8 @@ class TransactionsTable extends PostgresDB {
           date: result.rows[i].date,
           type: result.rows[i].type,
           value: result.rows[i].value,
-          originAccountId: result.rows[i].origin_account_id,
-          destinationAccountId: result.rows[i].destination_account_id,
+          origin_account_id: result.rows[i].origin_account_id,
+          destination_account_id: result.rows[i].destination_account_id,
         });
       }
 

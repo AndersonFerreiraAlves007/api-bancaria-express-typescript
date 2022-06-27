@@ -24,8 +24,6 @@ class FiltersExtractValidator {
   private verificationCodeValidator = VerificationCodeValidator;
 
   public constructor(filters: FiltersExtract) {
-    console.log('asasas')
-    console.log(filters)
     this.errors = '';
     const { user, account } = this.validate(filters);
     this.user = user;
@@ -46,10 +44,10 @@ class FiltersExtractValidator {
         document: validDocument.document,
       },
       account: {
-        accountNumber: validAccountNumber.accountNumber,
-        agencyNumber: validAgencyNumber.agencyNumber,
-        accountVerificationCode: validAccountVerificationCode.verificationCode,
-        agencyVerificationCode: validAgencyVerificationCode.verificationCode,
+        account_number: validAccountNumber.accountNumber,
+        agency_number: validAgencyNumber.agencyNumber,
+        account_verification_code: validAccountVerificationCode.verificationCode,
+        agency_verification_code: validAgencyVerificationCode.verificationCode,
       },
     };
   }

@@ -1,8 +1,8 @@
 import { PostgresDB } from '.';
-import { Account, FiltersAccount } from '../../../models';
+import { Account } from '../../../models';
 
 class AccountsTable extends PostgresDB {
-  public async insert(account: Account): Promise<any> {
+  public async insert(account: Account): Promise<Account> {
     try {
       this.client.connect();
 
@@ -26,18 +26,14 @@ class AccountsTable extends PostgresDB {
         ) RETURNING id
       `;
 
-      //console.log(insertAccountQuery)
-
-      //console.log(account)
-
       const result = await this.client.query(insertAccountQuery, [
         account.id,
-        account.agencyNumber,
-        account.agencyVerificationCode,
-        account.accountNumber,
-        account.accountVerificationCode,
+        account.agency_number,
+        account.agency_verification_code,
+        account.account_number,
+        account.account_verification_code,
         account.balance,
-        account.userId,
+        account.user_id,
       ]);
 
       this.client.end();
@@ -46,15 +42,14 @@ class AccountsTable extends PostgresDB {
         return result.rows[0];
       }
 
-      return null;
+      throw new Error('503: service temporarily unavailable');
     } catch (error) {
-      //console.log(error)
       this.client.end();
       throw new Error('503: service temporarily unavailable');
     }
   }
 
-  public async update(body: Partial<Account>, id: number): Promise<boolean> {
+  public async update(body: Partial<Account>, id: string): Promise<Account> {
     try {
       this.client.connect();
 
@@ -72,21 +67,19 @@ class AccountsTable extends PostgresDB {
       this.client.end();
 
       if (result.rows.length !== 0) {
-        return true;
+        return result.rows[0];
       }
 
-      return false;
+      throw new Error('503: service temporarily unavailable');
     } catch (error) {
       this.client.end();
       throw new Error('503: service temporarily unavailable');
     }
   }
 
-  public async list(filters: Partial<FiltersAccount>): Promise<Account[]> {
+  public async list(filters: Partial<Account>): Promise<Account[]> {
     try {
       this.client.connect();
-
-      console.log(filters)
 
       const keys = Object.entries(filters);
       const conditions = [];
@@ -113,18 +106,17 @@ class AccountsTable extends PostgresDB {
       for (let i = 0; i < result.rows.length; i += 1) {
         accounts.push({
           id: result.rows[i].id,
-          accountNumber: result.rows[i].account_number,
-          accountVerificationCode: result.rows[i].account_verification_code,
-          agencyNumber: result.rows[i].agency_number,
-          agencyVerificationCode: result.rows[i].agency_verification_code,
+          account_number: result.rows[i].account_number,
+          account_verification_code: result.rows[i].account_verification_code,
+          agency_number: result.rows[i].agency_number,
+          agency_verification_code: result.rows[i].agency_verification_code,
           balance: result.rows[i].balance,
-          userId: result.rows[i].user_id,
+          user_id: result.rows[i].user_id,
         });
       }
 
       return accounts;
     } catch (error) {
-      console.log(error)
       this.client.end();
       throw new Error('503: service temporarily unavailable');
     }

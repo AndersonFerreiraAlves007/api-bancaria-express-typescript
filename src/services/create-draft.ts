@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
-import { APIResponse, Draft, DraftResponse } from '../models';
-import { ExceptionTreatment } from '../utils';
+import { APIResponse, DraftBody, DraftResponse } from '../models';
+import { ExceptionTreatment, TYPE_TRANSACTION_DEPOSIT, TYPE_TRANSACTION_DRAFIT, RATE_DRAFT } from '../utils';
 import { DrafitDataValidator } from '../validators';
 import { AccountsTable } from '../clients/dao/postgres/accounts';
 import { TransactionsTable } from '../clients/dao/postgres/transactions';
@@ -15,66 +15,72 @@ class CreateDraftService {
 
   private transactionsTable = TransactionsTable;
 
-  public async execute(draft: Draft): Promise<APIResponse> {
+  public async execute(body: DraftBody): Promise<APIResponse> {
     try {
-      const validUserData = new this.draftDataValidator(draft);
-      console.log('lalala')
+      const validUserData = new this.draftDataValidator(body);
+
       if (validUserData.errors) {
         throw new Error(`400: ${validUserData.errors}`);
       }
-      console.log('lalala 1')
-      const user = await new this.usersTable().list({
-        document: validUserData.user.document,
-        password: validUserData.user.accountPassword
+
+      const userList = await new this.usersTable().list(validUserData.user)
+
+      if (userList.length < 0) {
+        throw new Error(`Usuário não cadastrado!`);
+      }
+
+      const user = userList[0]
+
+      const accountList = await new this.accountsTable().list(validUserData.account)
+
+      if (accountList.length < 0) {
+        throw new Error(`conta não cadastrada!`);
+      }
+
+      const account = accountList[0]
+
+      const deposit = await new this.transactionsTable().insert({
+        date: new Date(),
+        destination_account_id: account.id,
+        origin_account_id: null,
+        type: validUserData.transaction.type || '',
+        value: validUserData.transaction.value || 0,
+        id: v4()
       })
-      console.log('lalala 2')
-      const account = await new this.accountsTable().list({
-        account_number: validUserData.account.accountNumber,
-        account_verification_code: validUserData.account.accountVerificationCode,
-        agency_number: validUserData.account.agencyNumber,
-        agency_verification_code: validUserData.account.agencyVerificationCode,
+
+      await new this.transactionsTable().insert({
+        date: new Date(),
+        destination_account_id: account.id,
+        origin_account_id: null,
+        type: TYPE_TRANSACTION_DRAFIT,
+        value: (validUserData.transaction.value || 0) + RATE_DRAFT,
+        id: v4()
       })
-      console.log('lalala 3')
-      if (user.length > 0 && account.length > 0) {
 
-        const draft2 = await new this.transactionsTable().insert({
-          date: new Date(),
-          destinationAccountId: null,
-          originAccountId: account[0].id,
-          type: validUserData.transaction.type || '',
-          value: validUserData.transaction.value || 0,
-          id: v4()
-        })
+      await new this.accountsTable().update({
+        balance: account.balance +  (validUserData.transaction.value || 0) + RATE_DRAFT
+      }, account.id)
 
-        if(draft2) {
-
-          const responseData:DraftResponse = {
-            account: {
-              accountNumber: account[0].accountNumber,
-              accountVerificationCode: account[0].accountVerificationCode,
-              agencyNumber: account[0].agencyNumber,
-              agencyVerificationCode: account[0].agencyVerificationCode,
-              document: user[0].document,
-              owner: user[0].name,
-            },
-            date: draft2.date,
-            transactionId: draft2.id,
-            type: draft2.type,
-            value: draft2.value
-          }
-
-          return {
-            data: responseData,
-            messages: [],
-          } as APIResponse;
-        }
-       
+      const responseData:DraftResponse = {
+        account: {
+          accountNumber: account.account_number,
+          accountVerificationCode: account.account_verification_code,
+          agencyNumber: account.agency_number,
+          agencyVerificationCode: account.agency_verification_code,
+          document: user.document,
+          owner: user.name,
+        },
+        date: deposit.date,
+        transactionId: deposit.id,
+        type: deposit.type,
+        value: deposit.value
       }
 
       return {
-        data: {},
-        messages: ['an error occurred while creating user'],
+        data: responseData,
+        messages: [],
       } as APIResponse;
+
     } catch (error) {
       throw new ExceptionTreatment(
         error as Error,

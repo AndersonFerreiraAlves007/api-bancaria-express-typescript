@@ -1,5 +1,5 @@
 import { v4 } from 'uuid';
-import { APIResponse, User, AccountResponse } from '../models';
+import { APIResponse, AccountBody, AccountResponse, User } from '../models';
 import { ExceptionTreatment, generateAccount } from '../utils';
 import { AccountDataValidator } from '../validators';
 import { AccountsTable } from '../clients/dao/postgres/accounts';
@@ -12,66 +12,59 @@ class CreateAccountService {
 
   private usersTable = UsersTable;
 
-  public async execute(user: Partial<User>): Promise<APIResponse> {
+  public async execute(body: AccountBody): Promise<APIResponse> {
     try {
-      //console.log('lalala')
-      const validUserData = new this.userDataValidator(user);
+      const validUserData = new this.userDataValidator(body);
 
       if (validUserData.errors) {
         throw new Error(`400: ${validUserData.errors}`);
       }
-      //console.log('lalala 1')
-      const user2 = await new this.usersTable().list({
+
+      const userList = await new this.usersTable().list({
         document: validUserData.user.document
       })
-      //console.log('lalala 1.1')
-      let userData = null
 
-      if(user2.length > 0) {
-        userData = user2[0]
+      let user = null
+
+      if(userList.length > 0) {
+        user = userList[0]
       } else {
         validUserData.user.id = v4();
-        userData = await new this.usersTable().insert(validUserData.user as User);
+        user = await new this.usersTable().insert(validUserData.user as User);
       }
 
-      //console.log('lalala 2')
+      if (user) {
 
-      //console.log(userData)
-
-      if (userData) {
-        //console.log('lalala 3')
-        const account = generateAccount()
-//console.log(account)
-        const insertedAccount = await new this.accountsTable().insert({
-          accountNumber: account.accountNumber || '',
-          accountVerificationCode: account.accountVerificationCode || '',
-          agencyNumber: account.agencyNumber || '',
-          agencyVerificationCode: account.agencyVerificationCode || '',
-          balance: account.balance|| 0,
+        const accountBody = generateAccount()
+        const account = await new this.accountsTable().insert({
+          account_number: accountBody.account_number || '',
+          account_verification_code: accountBody.account_verification_code || '',
+          agency_number: accountBody.agency_number || '',
+          agency_verification_code: accountBody.account_verification_code || '',
+          balance: 0,
           id: v4(),
-          userId: userData.id || ''
+          user_id: user.id
         });
-        //console.log('lalala 4')
+
         const responseData: AccountResponse = {
-          accountNumber: account.accountNumber || '',
-          accountVerificationCode: account.accountVerificationCode || '',
-          agencyNumber: account.agencyNumber || '',
-          agencyVerificationCode: account.agencyVerificationCode || '',
-          birthdate: userData.birthdate,
-          document: userData.document,
-          owner: userData.name
+          accountNumber: account.account_number,
+          accountVerificationCode: account.account_verification_code,
+          agencyNumber: account.agency_number,
+          agencyVerificationCode: account.agency_verification_code,
+          birthdate: user.birthdate,
+          document: user.document,
+          owner: user.name
         }
-        //console.log('lalala 5')
+
         return {
           data: responseData,
           messages: [],
         } as APIResponse;
       }
 
-      //console.log('lalala 10')
       return {
         data: {},
-        messages: ['an error occurred while creating user'],
+        messages: ['an error occurred while account user'],
       } as APIResponse;
     } catch (error) {
       throw new ExceptionTreatment(

@@ -26,10 +26,10 @@ function makeAgencyVerificationCode(): string {
 
 function generateAccount(): Partial<Account> {
   return {
-    accountNumber: makeAccountNumber(),
-    accountVerificationCode: makeAccountVerificationCode(),
-    agencyNumber: makeAgencyNumber(),
-    agencyVerificationCode: makeAgencyVerificationCode(),
+    account_number: makeAccountNumber(),
+    account_verification_code: makeAccountVerificationCode(),
+    agency_number: makeAgencyNumber(),
+    agency_verification_code: makeAgencyVerificationCode(),
     balance: 0
   }
 }

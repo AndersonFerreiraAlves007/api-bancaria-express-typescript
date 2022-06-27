@@ -1,8 +1,8 @@
 import { PostgresDB } from '.';
-import { User, FiltersUser } from '../../../models';
+import { User } from '../../../models';
 
 class UsersTable extends PostgresDB {
-  public async insert(user: User): Promise<any> {
+  public async insert(user: User): Promise<User> {
     try {
       this.client.connect();
 
@@ -29,7 +29,7 @@ class UsersTable extends PostgresDB {
         user.name,
         user.email,
         user.birthdate,
-        user.accountPassword,
+        user.password,
         user.document,
       ]);
 
@@ -39,20 +39,16 @@ class UsersTable extends PostgresDB {
         return result.rows[0];
       }
 
-      return null;
+      throw new Error('503: service temporarily unavailable');
     } catch (error) {
-      console.log(error)
       this.client.end();
       throw new Error('503: service temporarily unavailable');
     }
   }
 
-  public async list(filters: Partial<FiltersUser>): Promise<User[]> {
+  public async list(filters: Partial<User>): Promise<User[]> {
     try {
       this.client.connect();
-
-      console.log('filters')
-      console.log(filters)
 
       const keys = Object.entries(filters);
       const conditions = [];
@@ -65,8 +61,6 @@ class UsersTable extends PostgresDB {
 
       const query = `SELECT * FROM users${conditions.length > 0 ? ` WHERE ${conditions.join(' AND ')}` : ''}`;
       let result;
-
-      //console.log(query)
 
       if (values.length > 0) {
         result = await this.client.query(query, values);
@@ -84,14 +78,13 @@ class UsersTable extends PostgresDB {
           document: result.rows[i].document,
           email: result.rows[i].email,
           name: result.rows[i].name,
-          accountPassword: result.rows[i].password,
+          password: result.rows[i].password,
           birthdate: result.rows[i].birthdate,
         });
       }
 
       return users;
     } catch (error) {
-      console.log(error)
       this.client.end();
       throw new Error('503: service temporarily unavailable');
     }

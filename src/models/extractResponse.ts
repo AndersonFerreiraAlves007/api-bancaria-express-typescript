@@ -1,10 +1,3 @@
-interface TransactionItem {
-  transactionId: string
-  date: Date
-  value: number
-  type: string
-}
-
 interface Extract
 {
   agencyNumber: string
@@ -13,9 +6,14 @@ interface Extract
   accountVerificationCode: string
   owner: string
   document: string
-  birthdate: string
+  birthdate: Date
   balance: number
-  transactions: TransactionItem[]
+  transactions: ({
+    transactionId: string
+    date: Date
+    value: number
+    type: string
+  })[]
 }
 
-export { Extract, TransactionItem };
+export { Extract };

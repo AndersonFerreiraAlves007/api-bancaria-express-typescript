@@ -1,5 +1,5 @@
 import { v4 } from 'uuid';
-import { APIResponse, FiltersExtract, Extract, TransactionItem } from '../models';
+import { APIResponse, FiltersExtract, Extract } from '../models';
 import { ExceptionTreatment } from '../utils';
 import { FiltersExtractValidator } from '../validators';
 import { AccountsTable } from '../clients/dao/postgres/accounts';
@@ -19,75 +19,71 @@ class GetExtractService {
     try {
       const validUserData = new this.filtersExtractValidator(filters);
 
-      console.log(filters)
-
-      console.log('lalala')
       if (validUserData.errors) {
         throw new Error(`400: ${validUserData.errors}`);
       }
-      console.log('lalala 2')
-      const user = await new this.usersTable().list(validUserData.user)
-      console.log('lalala 2.1')
-      const account = await new this.accountsTable().list({
-        account_number: validUserData.account.accountNumber,
-        account_verification_code: validUserData.account.accountVerificationCode,
-        agency_number: validUserData.account.agencyNumber,
-        agency_verification_code: validUserData.account.agencyVerificationCode,
+
+      const userList = await new this.usersTable().list(validUserData.user)
+
+      if (userList.length < 0) {
+        throw new Error(`Usuário não cadastrado!`);
+      }
+
+      const user = userList[0]
+
+      const accountList = await new this.accountsTable().list(validUserData.account)
+
+      if (accountList.length < 0) {
+        throw new Error(`Conta não cadastrada!`);
+      }
+
+      const account = accountList[0]
+
+      const transactionOrigin = await new this.transactionsTable().list({
+        destination_account_id: account.id
       })
-      console.log('lalala 3')
-      if (user.length > 0 && account.length > 0) {
 
+      const transactionDestination = await new this.transactionsTable().list({
+        origin_account_id: account.id
+      })
 
-        const transactionOrigin = await new this.transactionsTable().list({
-          destination_account_id: account[0].id
+      const transactions = []
+
+      for(let i = 0; i < transactionOrigin.length; i++) {
+        transactions.push({
+          transactionId: transactionOrigin[0].id,
+          date: transactionOrigin[0].date,
+          value: transactionOrigin[0].value,
+          type: transactionOrigin[0].type,
         })
-  
-        const transactionDestination = await new this.transactionsTable().list({
-          origin_account_id: account[0].id
+      }
+
+      for(let i = 0; i < transactionDestination.length; i++) {
+        transactions.push({
+          transactionId: transactionDestination[0].id,
+          date: transactionDestination[0].date,
+          value: transactionDestination[0].value,
+          type: transactionDestination[0].type,
         })
+      }
 
-        const transactions: TransactionItem[] = []
-
-        for(let i = 0; i < transactionOrigin.length; i++) {
-          transactions.push({
-            transactionId: transactionOrigin[0].id,
-            date: transactionOrigin[0].date,
-            value: transactionOrigin[0].value,
-            type: transactionOrigin[0].type,
-          })
-        }
-
-        for(let i = 0; i < transactionDestination.length; i++) {
-          transactions.push({
-            transactionId: transactionDestination[0].id,
-            date: transactionDestination[0].date,
-            value: transactionDestination[0].value,
-            type: transactionDestination[0].type,
-          })
-        }
-
-        const responseData:Extract = {
-          accountNumber: account[0].accountNumber,
-          accountVerificationCode: account[0].accountVerificationCode,
-          agencyNumber: account[0].agencyNumber,
-          agencyVerificationCode: account[0].agencyVerificationCode,
-          balance: account[0].balance,
-          birthdate: user[0].birthdate,
-          document: user[0].document,
-          owner: user[0].name,
-          transactions
-        }
-
-        return {
-          data: responseData,
-          messages: [],
-        } as APIResponse;
+      const responseData:Extract = {
+        accountNumber: account.account_number,
+        accountVerificationCode: account.account_verification_code,
+        agencyNumber: account.agency_number,
+        agencyVerificationCode: account.agency_verification_code,
+        balance: account.balance,
+        birthdate: user.birthdate,
+        document: user.document,
+        owner: user.name,
+        transactions
       }
 
       return {
-        data: {},
-        messages: ['an error occurred while creating user'],
+        data: responseData,
+        messages: [],
       } as APIResponse;
+
     } catch (error) {
       throw new ExceptionTreatment(
         error as Error,

@@ -5,7 +5,7 @@ import {
   DateValidator,
   PasswordValidator
 } from '.';
-import { User } from '../models';
+import { AccountBody, User } from '../models';
 
 class AccountDataValidator {
   public user: Partial<User>;
@@ -22,29 +22,28 @@ class AccountDataValidator {
 
   private passwordValidator = PasswordValidator;
 
-  public constructor(user: Partial<User>) {
+  public constructor(body: AccountBody) {
     this.errors = '';
-    this.user = this.validate(user);
+    this.user = this.validate(body);
   }
 
-  private validate(user: Partial<User>): Partial<User> {
-    const validEmail = new this.emailValidator(user.email || '');
-    const validName = new this.nameValidator(user.name || '');
-    const validBirthdate = new this.dateValidator(user.birthdate || '');
-    const validDocument = new this.documentValidator(user.document || '');
-    const validPassword = new this.passwordValidator(user.accountPassword || '');
+  private validate(body: AccountBody): Partial<User> {
+    const validEmail = new this.emailValidator(body.email);
+    const validName = new this.nameValidator(body.name);
+    const validBirthdate = new this.dateValidator(body.birthdate);
+    const validDocument = new this.documentValidator(body.document);
+    const validPassword = new this.passwordValidator(body.accountPassword);
 
     this.errors = this.errors.concat(`${validEmail.errors}${validName.errors}${validBirthdate.errors}${validDocument.errors}${validPassword.errors}`);
 
-    const userData: Partial<User> = {
+    return {
       birthdate: validBirthdate.date,
       email: validEmail.email,
       name: validName.name,
       document: validDocument.document,
-      accountPassword: validPassword.password
+      password: validPassword.password
     };
 
-    return userData;
   }
 }
 

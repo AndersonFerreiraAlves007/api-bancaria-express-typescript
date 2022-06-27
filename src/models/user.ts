@@ -3,9 +3,9 @@ interface User
   id: string
   name: string
   email: string
-  birthdate: string
+  birthdate: Date
   document: string
-  accountPassword: string
+  password: string
 }
 
 export { User };

@@ -6,7 +6,7 @@ import {
   ValueValidator,
 } from '.';
 import {
-  User, Account, Deposit, Transaction,
+  User, Account, DepositBody, Transaction,
 } from '../models';
 import { TYPE_TRANSACTION_DEPOSIT } from '../utils';
 
@@ -29,21 +29,21 @@ class DepositDataValidator {
 
   private valueValidator = ValueValidator;
 
-  public constructor(deposit: Deposit) {
+  public constructor(body: DepositBody) {
     this.errors = '';
-    const { user, account, transaction } = this.validate(deposit);
+    const { user, account, transaction } = this.validate(body);
     this.user = user;
     this.account = account;
     this.transaction = transaction;
   }
 
-  private validate(deposit: Deposit): { user: Partial<User>, account: Partial<Account>, transaction: Partial<Transaction> } {
-    const validAgencyNumber = new this.agencyNumberValidator(deposit.account.agencyNumber);
-    const validAgencyVerificationCode = new this.verificationCodeValidator(deposit.account.agencyVerificationCode);
-    const validAccountNumber = new this.accountNumberValidator(deposit.account.accountNumber);
-    const validAccountVerificationCode = new this.verificationCodeValidator(deposit.account.accountVerificationCode);
-    const validDocument = new this.documentValidator(deposit.account.document);
-    const validValue = new this.valueValidator(deposit.value);
+  private validate(body: DepositBody): { user: Partial<User>, account: Partial<Account>, transaction: Partial<Transaction> } {
+    const validAgencyNumber = new this.agencyNumberValidator(body.account.agencyNumber);
+    const validAgencyVerificationCode = new this.verificationCodeValidator(body.account.agencyVerificationCode);
+    const validAccountNumber = new this.accountNumberValidator(body.account.accountNumber);
+    const validAccountVerificationCode = new this.verificationCodeValidator(body.account.accountVerificationCode);
+    const validDocument = new this.documentValidator(body.account.document);
+    const validValue = new this.valueValidator(body.value);
 
     this.errors = this.errors.concat(`${validAgencyNumber.errors}${validAgencyVerificationCode.errors}${validAccountNumber.errors}${validAccountVerificationCode.errors}${validDocument.errors}${validValue.errors}`);
 
@@ -52,10 +52,10 @@ class DepositDataValidator {
         document: validDocument.document,
       },
       account: {
-        accountNumber: validAccountNumber.accountNumber,
-        agencyNumber: validAgencyNumber.agencyNumber,
-        accountVerificationCode: validAccountVerificationCode.verificationCode,
-        agencyVerificationCode: validAgencyVerificationCode.verificationCode,
+        account_number: validAccountNumber.accountNumber,
+        agency_number: validAgencyNumber.agencyNumber,
+        account_verification_code: validAccountVerificationCode.verificationCode,
+        agency_verification_code: validAgencyVerificationCode.verificationCode,
       },
       transaction: {
         date: new Date(),

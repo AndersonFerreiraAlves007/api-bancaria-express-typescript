@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
-import { APIResponse, Transfer, TransferResponse } from '../models';
-import { ExceptionTreatment } from '../utils';
+import { APIResponse, TransferBody, TransferResponse } from '../models';
+import { ExceptionTreatment, TYPE_TRANSACTION_TRANSFER, RATE_TRANSFER } from '../utils';
 import { TransferDataValidator } from '../validators';
 import { AccountsTable } from '../clients/dao/postgres/accounts';
 import { TransactionsTable } from '../clients/dao/postgres/transactions';
@@ -15,7 +15,7 @@ class CreateTransferService {
 
   private transactionsTable = TransactionsTable;
 
-  public async execute(transfer: Transfer): Promise<APIResponse> {
+  public async execute(transfer: TransferBody): Promise<APIResponse> {
     try {
       const validUserData = new this.transferDataValidator(transfer);
 
@@ -23,86 +23,95 @@ class CreateTransferService {
         throw new Error(`400: ${validUserData.errors}`);
       }
 
-      const originUser = await new this.usersTable().list({
-        document: validUserData.originUser.document,
-        password: validUserData.originUser.accountPassword
+      const originUserList = await new this.usersTable().list(validUserData.originUser)
+
+      if (originUserList.length < 0) {
+        throw new Error(`Usuário não cadastrado!!`);
+      }
+
+      const originUser = originUserList[0]
+
+      const destinationUserList = await new this.usersTable().list(validUserData.destinationUser)
+
+      if (destinationUserList.length < 0) {
+        throw new Error(`Usuário não cadastrado!!`);
+      }
+
+      const destinationUser = destinationUserList[0]
+
+      const originAccountList = await new this.accountsTable().list(validUserData.originAccount)
+
+      if (originAccountList.length < 0) {
+        throw new Error(`Conta não cadastrada!`);
+      }
+
+      const originAccount = originAccountList[0]
+
+      const destinationAccountList = await new this.accountsTable().list(validUserData.destinationAccount)
+
+      if (destinationAccountList.length < 0) {
+        throw new Error(`Conta não cadastrada!`);
+      }
+
+      const destinationAccount = destinationAccountList[0]
+
+      const draft = await new this.transactionsTable().insert({
+        date: new Date(),
+        destination_account_id: destinationAccount.id,
+        origin_account_id: originAccount.id,
+        type: validUserData.transaction.type || '',
+        value: validUserData.transaction.value || 0,
+        id: v4()
       })
 
-      const destinationUser = await new this.usersTable().list({
-        document: validUserData.destinationUser.document,
+      const taxa = await new this.transactionsTable().insert({
+        date: new Date(),
+        destination_account_id: originAccount.id,
+        origin_account_id: null,
+        type: 'draft',
+        value: RATE_TRANSFER,
+        id: v4()
       })
 
-      const originAccount = await new this.accountsTable().list({
-        account_number: validUserData.originAccount.accountNumber,
-        account_verification_code: validUserData.originAccount.accountVerificationCode,
-        agency_number: validUserData.originAccount.agencyNumber,
-        agency_verification_code: validUserData.originAccount.agencyVerificationCode,
-      })
+      await new this.accountsTable().update({
+        balance: originAccount.balance - (validUserData.transaction.value || 0)
+      }, originAccount.id)
 
-      const destinationAccount = await new this.accountsTable().list({
-        account_number: validUserData.destinationAccount.accountNumber,
-        account_verification_code: validUserData.destinationAccount.accountVerificationCode,
-        agency_number: validUserData.destinationAccount.agencyNumber,
-        agency_verification_code: validUserData.destinationAccount.agencyVerificationCode,
-      })
+      await new this.accountsTable().update({
+        balance: destinationAccount.balance + (validUserData.transaction.value || 0)
+      }, destinationAccount.id)
 
-      if (
-        originUser.length > 0 && 
-        destinationUser.length > 0 && 
-        originAccount.length > 0 && 
-        destinationAccount.length > 0
-        ) 
-      {
-
-        const draft2 = await new this.transactionsTable().insert({
-          date: new Date(),
-          destinationAccountId: destinationAccount[0].id,
-          originAccountId: originAccount[0].id,
-          type: validUserData.transaction.type || '',
-          value: validUserData.transaction.value || 0,
-          id: v4()
-        })
-
-        if(draft2) {
-
-          const responseData:TransferResponse = {
-            date: draft2.date,
-            transactionId: draft2.id,
-            type: draft2.type,
-            value: draft2.value,
-            destinationAccount: {
-              accountNumber: destinationAccount[0].accountNumber,
-              accountVerificationCode: destinationAccount[0].accountVerificationCode,
-              agencyNumber: destinationAccount[0].agencyNumber,
-              agencyVerificationCode: destinationAccount[0].agencyVerificationCode,
-              document: destinationUser[0].document
-            },
-            originAccount: {
-              accountNumber: originAccount[0].accountNumber,
-              accountVerificationCode: originAccount[0].accountVerificationCode,
-              agencyNumber: originAccount[0].agencyNumber,
-              agencyVerificationCode: originAccount[0].agencyVerificationCode,
-              document: originUser[0].document
-            } 
-          }
-
-          return {
-            data: responseData,
-            messages: [],
-          } as APIResponse;
-        }
-       
+      const responseData:TransferResponse = {
+        date: draft.date,
+        transactionId: draft.id,
+        type: draft.type,
+        value: draft.value,
+        destinationAccount: {
+          accountNumber: destinationAccount.account_number,
+          accountVerificationCode: destinationAccount.account_verification_code,
+          agencyNumber: destinationAccount.agency_number,
+          agencyVerificationCode: destinationAccount.agency_verification_code,
+          document: destinationUser.document
+        },
+        originAccount: {
+          accountNumber: originAccount.account_number,
+          accountVerificationCode: originAccount.account_verification_code,
+          agencyNumber: originAccount.agency_number,
+          agencyVerificationCode: originAccount.agency_verification_code,
+          document: originUser.document
+        } 
       }
 
       return {
-        data: {},
-        messages: ['an error occurred while creating user'],
+        data: responseData,
+        messages: [],
       } as APIResponse;
+
     } catch (error) {
       throw new ExceptionTreatment(
         error as Error,
         500,
-        'an error occurred while inserting user on database',
+        'an error occurred while inserting transfer on database',
       );
     }
   }

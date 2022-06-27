@@ -1,4 +1,4 @@
-interface Deposit
+interface DraftBody
 {
   account: {
     agencyNumber: string
@@ -6,8 +6,9 @@ interface Deposit
     accountNumber: string
     accountVerificationCode: string
     document: string
+    accountPassword: string
   }
   value: number
 }
 
-export { Deposit };
+export { DraftBody };

@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
 import { CreateAccountService } from '../services';
 import { ResponseWriter } from '../utils';
-
+import { AccountBody } from '../models'
+ 
 class CreateAccount {
   private service = CreateAccountService;
 
   private responseWriter = ResponseWriter;
 
-  public async handle(req: Request, res: Response) {
+  public async handle(req: Request<{}, {}, AccountBody, {}>, res: Response) {
     try {
       const response = await new this.service().execute(req.body);
       this.responseWriter.success(res, 201, response);

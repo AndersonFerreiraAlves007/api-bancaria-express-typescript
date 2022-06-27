@@ -7,7 +7,7 @@ import {
   PasswordValidator
 } from '.';
 import {
-  User, Account, Transfer, Transaction,
+  User, Account, TransferBody, Transaction,
 } from '../models';
 import { TYPE_TRANSACTION_TRANSFER } from '../utils';
 
@@ -36,9 +36,9 @@ class TransferDataValidator {
 
   private passwordValidator = PasswordValidator;
 
-  public constructor(transfer: Transfer) {
+  public constructor(body: TransferBody) {
     this.errors = '';
-    const { userOrigin, userDestination, originAccount, destinationAccount, transaction } = this.validate(transfer);
+    const { userOrigin, userDestination, originAccount, destinationAccount, transaction } = this.validate(body);
     this.originUser = userOrigin;
     this.destinationUser = userDestination;
     this.originAccount = originAccount;
@@ -46,45 +46,45 @@ class TransferDataValidator {
     this.transaction = transaction;
   }
 
-  private validate(transfer: Transfer): { userOrigin: Partial<User>, userDestination: Partial<User>, originAccount: Partial<Account>, destinationAccount: Partial<Account>, transaction: Partial<Transaction> } {
-    const validOriginAgencyNumber = new this.agencyNumberValidator(transfer.originAccount.agencyNumber);
-    const validOriginAgencyVerificationCode = new this.verificationCodeValidator(transfer.originAccount.agencyVerificationCode);
-    const validOriginAccountNumber = new this.accountNumberValidator(transfer.originAccount.accountNumber);
-    const validOriginAccountVerificationCode = new this.verificationCodeValidator(transfer.originAccount.accountVerificationCode);
+  private validate(body: TransferBody): { userOrigin: Partial<User>, userDestination: Partial<User>, originAccount: Partial<Account>, destinationAccount: Partial<Account>, transaction: Partial<Transaction> } {
+    const validOriginAgencyNumber = new this.agencyNumberValidator(body.originAccount.agencyNumber);
+    const validOriginAgencyVerificationCode = new this.verificationCodeValidator(body.originAccount.agencyVerificationCode);
+    const validOriginAccountNumber = new this.accountNumberValidator(body.originAccount.accountNumber);
+    const validOriginAccountVerificationCode = new this.verificationCodeValidator(body.originAccount.accountVerificationCode);
 
-    const validDestinationAgencyNumber = new this.agencyNumberValidator(transfer.destinationAccount.agencyNumber);
-    const validDestinationAgencyVerificationCode = new this.verificationCodeValidator(transfer.destinationAccount.agencyVerificationCode);
-    const validDestinationAccountNumber = new this.accountNumberValidator(transfer.destinationAccount.accountNumber);
-    const validDestinationAccountVerificationCode = new this.verificationCodeValidator(transfer.destinationAccount.accountVerificationCode);
+    const validDestinationAgencyNumber = new this.agencyNumberValidator(body.destinationAccount.agencyNumber);
+    const validDestinationAgencyVerificationCode = new this.verificationCodeValidator(body.destinationAccount.agencyVerificationCode);
+    const validDestinationAccountNumber = new this.accountNumberValidator(body.destinationAccount.accountNumber);
+    const validDestinationAccountVerificationCode = new this.verificationCodeValidator(body.destinationAccount.accountVerificationCode);
 
-    const validOriginDocument = new this.documentValidator(transfer.originAccount.document);
-    const validPassword = new this.passwordValidator(transfer.originAccount.accountPassword);
+    const validOriginDocument = new this.documentValidator(body.originAccount.document);
+    const validPassword = new this.passwordValidator(body.originAccount.accountPassword);
     
-    const validDestinationDocument = new this.documentValidator(transfer.destinationAccount.document);
+    const validDestinationDocument = new this.documentValidator(body.destinationAccount.document);
 
-    const validValue = new this.valueValidator(transfer.value);
+    const validValue = new this.valueValidator(body.value);
 
     this.errors = this.errors.concat(`${validOriginAgencyNumber.errors}${validOriginAgencyVerificationCode.errors}${validOriginAccountNumber.errors}${validOriginAccountVerificationCode.errors}${validOriginDocument.errors}${validPassword.errors}${validDestinationAgencyNumber.errors}${validDestinationAgencyVerificationCode.errors}${validDestinationAccountNumber.errors}${validDestinationAccountVerificationCode.errors}${validDestinationDocument.errors}${validValue.errors}${validPassword.errors}`);
 
     return {
       userOrigin: {
         document: validOriginDocument.document,
-        accountPassword: validPassword.password
+        password: validPassword.password
       },
       userDestination: {
         document: validDestinationDocument.document,
       },
       originAccount: {
-        accountNumber: validOriginAccountNumber.accountNumber,
-        agencyNumber: validOriginAgencyNumber.agencyNumber,
-        accountVerificationCode: validOriginAccountVerificationCode.verificationCode,
-        agencyVerificationCode: validOriginAgencyVerificationCode.verificationCode,
+        account_number: validOriginAccountNumber.accountNumber,
+        agency_number: validOriginAgencyNumber.agencyNumber,
+        account_verification_code: validOriginAccountVerificationCode.verificationCode,
+        agency_verification_code: validOriginAgencyVerificationCode.verificationCode,
       },
       destinationAccount: {
-        accountNumber: validDestinationAccountNumber.accountNumber,
-        agencyNumber: validDestinationAgencyNumber.agencyNumber,
-        accountVerificationCode: validDestinationAccountVerificationCode.verificationCode,
-        agencyVerificationCode: validDestinationAgencyVerificationCode.verificationCode,
+        account_number: validDestinationAccountNumber.accountNumber,
+        agency_number: validDestinationAgencyNumber.agencyNumber,
+        account_verification_code: validDestinationAccountVerificationCode.verificationCode,
+        agency_verification_code: validDestinationAgencyVerificationCode.verificationCode,
       },
       transaction: {
         date: new Date(),
