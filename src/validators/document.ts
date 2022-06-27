@@ -15,7 +15,7 @@ class DocumentValidator {
       return '';
     }
 
-    if (/\d{11}/.test(document)) {
+    if (!/\d{11}/.test(document)) {
       this.errors += 'document:invalid document|';
 
       return '';

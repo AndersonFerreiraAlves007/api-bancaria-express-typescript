@@ -1,10 +1,10 @@
 interface Transaction
 {
-  id: string,
-  originAccountId: string
-  destinationAccountId: string
+  id: string
+  originAccountId: string | null
+  destinationAccountId: string | null
   date: Date
-  value: string
+  value: number
   type: string
 }
 

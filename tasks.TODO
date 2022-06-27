@@ -70,9 +70,9 @@ API Bancária com Typescript:
         ✔ response-writer @done(22-06-25 16:10)
         ✔ exception-treatment @done(22-06-25 16:10)
       clients/dao/postgres:
-        ☐ users
-        ☐ accounts
-        ☐ transactions
+        ✔ users @done(22-06-26 00:08)
+        ✔ accounts @done(22-06-26 00:08)
+        ✔ transactions @done(22-06-26 00:08)
     Modelagem Tabelas:
       Users:
         ✔ id @done(22-06-25 20:58)

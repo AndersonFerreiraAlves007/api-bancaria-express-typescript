@@ -15,7 +15,7 @@ class AgencyNumberValidator {
       return '';
     }
 
-    if (/\d{4}/.test(agencyNumber)) {
+    if (!/\d{4}/.test(agencyNumber)) {
       this.errors += 'agencyNumber:invalid agencyNumber|';
 
       return '';

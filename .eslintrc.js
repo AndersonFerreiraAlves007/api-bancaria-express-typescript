@@ -19,5 +19,6 @@ module.exports = {
     'import/no-unresolved': 'off',
     'import/extensions': 'off',
     'new-cap': 'off',
+    'max-len': '80',
   },
 };

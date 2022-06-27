@@ -15,7 +15,7 @@ class AccountNumberValidator {
       return '';
     }
 
-    if (/\d{6}/.test(accountNumber)) {
+    if (!/\d{6}/.test(accountNumber)) {
       this.errors += 'accountNumber:invalid accountNumber|';
 
       return '';

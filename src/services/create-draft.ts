@@ -1,31 +1,74 @@
 import { v4 } from 'uuid';
-import { APIResponse, User } from '../models';
+import { APIResponse, Draft, DraftResponse } from '../models';
 import { ExceptionTreatment } from '../utils';
-import { UserDataValidator } from '../validators';
+import { DrafitDataValidator } from '../validators';
+import { AccountsTable } from '../clients/dao/postgres/accounts';
 import { TransactionsTable } from '../clients/dao/postgres/transactions';
+import { UsersTable } from '../clients/dao/postgres/users';
 
 class CreateDraftService {
-  private userDataValidator = UserDataValidator;
+  private draftDataValidator = DrafitDataValidator;
 
-  private usersTable = TransactionsTable;
+  private usersTable = UsersTable;
 
-  public async execute(user: User): Promise<APIResponse> {
+  private accountsTable = AccountsTable;
+
+  private transactionsTable = TransactionsTable;
+
+  public async execute(draft: Draft): Promise<APIResponse> {
     try {
-      const validUserData = new this.userDataValidator(user);
-
+      const validUserData = new this.draftDataValidator(draft);
+      console.log('lalala')
       if (validUserData.errors) {
         throw new Error(`400: ${validUserData.errors}`);
       }
+      console.log('lalala 1')
+      const user = await new this.usersTable().list({
+        document: validUserData.user.document,
+        password: validUserData.user.accountPassword
+      })
+      console.log('lalala 2')
+      const account = await new this.accountsTable().list({
+        account_number: validUserData.account.accountNumber,
+        account_verification_code: validUserData.account.accountVerificationCode,
+        agency_number: validUserData.account.agencyNumber,
+        agency_verification_code: validUserData.account.agencyVerificationCode,
+      })
+      console.log('lalala 3')
+      if (user.length > 0 && account.length > 0) {
 
-      validUserData.user.id = v4();
+        const draft2 = await new this.transactionsTable().insert({
+          date: new Date(),
+          destinationAccountId: null,
+          originAccountId: account[0].id,
+          type: validUserData.transaction.type || '',
+          value: validUserData.transaction.value || 0,
+          id: v4()
+        })
 
-      const insertedUser = await new this.usersTable().insert(validUserData.user as User);
+        if(draft2) {
 
-      if (insertedUser) {
-        return {
-          data: validUserData.user,
-          messages: [],
-        } as APIResponse;
+          const responseData:DraftResponse = {
+            account: {
+              accountNumber: account[0].accountNumber,
+              accountVerificationCode: account[0].accountVerificationCode,
+              agencyNumber: account[0].agencyNumber,
+              agencyVerificationCode: account[0].agencyVerificationCode,
+              document: user[0].document,
+              owner: user[0].name,
+            },
+            date: draft2.date,
+            transactionId: draft2.id,
+            type: draft2.type,
+            value: draft2.value
+          }
+
+          return {
+            data: responseData,
+            messages: [],
+          } as APIResponse;
+        }
+       
       }
 
       return {
@@ -34,9 +77,9 @@ class CreateDraftService {
       } as APIResponse;
     } catch (error) {
       throw new ExceptionTreatment(
-                error as Error,
-                500,
-                'an error occurred while inserting user on database',
+        error as Error,
+        500,
+        'an error occurred while inserting user on database',
       );
     }
   }

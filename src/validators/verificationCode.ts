@@ -1,4 +1,4 @@
-class AccountVerificationCodeValidator {
+class VerificationCodeValidator {
   public verificationCode: string;
 
   public errors: string;
@@ -15,7 +15,7 @@ class AccountVerificationCodeValidator {
       return '';
     }
 
-    if (/\d{1}/.test(verificationCode)) {
+    if (!/\d{1}/.test(verificationCode)) {
       this.errors += 'verificationCode:invalid verificationCode|';
 
       return '';
@@ -25,4 +25,4 @@ class AccountVerificationCodeValidator {
   }
 }
 
-export { AccountVerificationCodeValidator };
+export { VerificationCodeValidator };

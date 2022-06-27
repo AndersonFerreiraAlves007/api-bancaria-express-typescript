@@ -1,11 +1,11 @@
-interface User
+interface FiltersUser
 {
   id: string
   name: string
   email: string
   birthdate: string
   document: string
-  accountPassword: string
+  password: string
 }
 
-export { User };
+export { FiltersUser };

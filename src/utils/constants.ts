@@ -1,3 +1,3 @@
-export const TYPE_TRANSACTION_TRANSFER = '';
-export const TYPE_TRANSACTION_DEPOSIT = '';
-export const TYPE_TRANSACTION_DRAFIT = '';
+export const TYPE_TRANSACTION_TRANSFER = 'transfer';
+export const TYPE_TRANSACTION_DEPOSIT = 'deposit';
+export const TYPE_TRANSACTION_DRAFIT = 'draft';

@@ -1,13 +1,13 @@
 import { PostgresDB } from '.';
-import { Transaction } from '../../../models';
+import { Transaction, FiltersTransaction } from '../../../models';
 
 class TransactionsTable extends PostgresDB {
-  public async insert(transaction: Transaction): Promise<boolean> {
+  public async insert(transaction: Transaction): Promise<any> {
     try {
       this.client.connect();
 
       const insertTransactionQuery = `
-        INSERT INTO users (
+        INSERT INTO transactions (
           id,
           date,
           value,
@@ -36,48 +36,55 @@ class TransactionsTable extends PostgresDB {
       this.client.end();
 
       if (result.rows.length !== 0) {
-        return true;
+        return result.rows[0];
       }
 
-      return false;
+      return null;
     } catch (error) {
+      console.log(error)
       this.client.end();
       throw new Error('503: service temporarily unavailable');
     }
   }
 
-  public async list(user: User): Promise<boolean> {
+  public async list(filters: Partial<FiltersTransaction>): Promise<Transaction[]> {
     try {
       this.client.connect();
 
-      const insertUserQuery = `
-        INSERT INTO users (
-          id,
-          name,
-          email,
-          birthdate
-        ) VALUES (
-          $1,
-          $2,
-          $3,
-          $4
-        ) RETURNING id
-    `;
+      const keys = Object.entries(filters);
+      const conditions = [];
+      const values = [];
 
-      const result = await this.client.query(insertUserQuery, [
-        user.id,
-        user.name,
-        user.email,
-        user.birthdate,
-      ]);
+      for (let i = 0; i < keys.length; i += 1) {
+        conditions.push(`${keys[i][0]}=$${i + 1}`);
+        values.push(keys[i][1]);
+      }
+
+      const query = `SELECT * FROM transactions${conditions.length > 0 ? ` WHERE ${conditions.join(' AND ')}` : ''}`;
+      let result;
+
+      if (values.length > 0) {
+        result = await this.client.query(query, values);
+      } else {
+        result = await this.client.query(query);
+      }
 
       this.client.end();
 
-      if (result.rows.length !== 0) {
-        return true;
+      const transactions: Transaction[] = [];
+
+      for (let i = 0; i < result.rows.length; i += 1) {
+        transactions.push({
+          id: result.rows[i].id,
+          date: result.rows[i].date,
+          type: result.rows[i].type,
+          value: result.rows[i].value,
+          originAccountId: result.rows[i].origin_account_id,
+          destinationAccountId: result.rows[i].destination_account_id,
+        });
       }
 
-      return false;
+      return transactions;
     } catch (error) {
       this.client.end();
       throw new Error('503: service temporarily unavailable');
