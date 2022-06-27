@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 import { APIResponse, TransferBody, TransferResponse } from '../models';
-import { ExceptionTreatment, TYPE_TRANSACTION_TRANSFER, RATE_TRANSFER } from '../utils';
+import { ExceptionTreatment, TYPE_TRANSACTION_TRANSFER, RATE_TRANSFER, TYPE_TRANSACTION_DRAFIT } from '../utils';
 import { TransferDataValidator } from '../validators';
 import { AccountsTable } from '../clients/dao/postgres/accounts';
 import { TransactionsTable } from '../clients/dao/postgres/transactions';
@@ -15,9 +15,9 @@ class CreateTransferService {
 
   private transactionsTable = TransactionsTable;
 
-  public async execute(transfer: TransferBody): Promise<APIResponse> {
+  public async execute(body: TransferBody): Promise<APIResponse> {
     try {
-      const validUserData = new this.transferDataValidator(transfer);
+      const validUserData = new this.transferDataValidator(body);
 
       if (validUserData.errors) {
         throw new Error(`400: ${validUserData.errors}`);
@@ -55,37 +55,41 @@ class CreateTransferService {
 
       const destinationAccount = destinationAccountList[0]
 
-      const draft = await new this.transactionsTable().insert({
+      if (Number(originAccount.balance) < (validUserData.transaction.value || 0) + RATE_TRANSFER) {
+        throw new Error(`Saldo Insuficiente!`);
+      }
+
+      const transfer = await new this.transactionsTable().insert({
         date: new Date(),
         destination_account_id: destinationAccount.id,
         origin_account_id: originAccount.id,
         type: validUserData.transaction.type || '',
-        value: validUserData.transaction.value || 0,
+        value: Number(validUserData.transaction.value || 0),
         id: v4()
       })
 
-      const taxa = await new this.transactionsTable().insert({
+      await new this.transactionsTable().insert({
         date: new Date(),
         destination_account_id: originAccount.id,
         origin_account_id: null,
-        type: 'draft',
-        value: RATE_TRANSFER,
+        type: TYPE_TRANSACTION_DRAFIT,
+        value: Number(RATE_TRANSFER),
         id: v4()
       })
 
       await new this.accountsTable().update({
-        balance: originAccount.balance - (validUserData.transaction.value || 0)
+        balance: Number(Number(originAccount.balance) - (validUserData.transaction.value || 0))
       }, originAccount.id)
 
       await new this.accountsTable().update({
-        balance: destinationAccount.balance + (validUserData.transaction.value || 0)
+        balance: Number(Number(destinationAccount.balance) + (validUserData.transaction.value || 0))
       }, destinationAccount.id)
 
       const responseData:TransferResponse = {
-        date: draft.date,
-        transactionId: draft.id,
-        type: draft.type,
-        value: draft.value,
+        date: transfer.date,
+        transactionId: transfer.id,
+        type: transfer.type,
+        value: transfer.value,
         destinationAccount: {
           accountNumber: destinationAccount.account_number,
           accountVerificationCode: destinationAccount.account_verification_code,

@@ -23,7 +23,7 @@ class AccountsTable extends PostgresDB {
           $5,
           $6,
           $7
-        ) RETURNING id
+        ) RETURNING *
       `;
 
       const result = await this.client.query(insertAccountQuery, [
@@ -60,8 +60,9 @@ class AccountsTable extends PostgresDB {
         fields.push(`${keys[i][0]}=$${i + 1}`);
         values.push(keys[i][1]);
       }
-      const query = `UPDATE accounts SET ${fields.join(',')}${keys.length > 0 ? ',' : ''} WHERE id=$${values.length + 1} RETURNING *`;
+      const query = `UPDATE accounts SET ${fields.join(',')} WHERE id=$${values.length + 1} RETURNING *`;
       values.push(id);
+      
       const result = await this.client.query(query, values);
 
       this.client.end();

@@ -39,31 +39,19 @@ class GetExtractService {
 
       const account = accountList[0]
 
-      const transactionOrigin = await new this.transactionsTable().list({
-        destination_account_id: account.id
-      })
-
-      const transactionDestination = await new this.transactionsTable().list({
+      const transactionExtract = await new this.transactionsTable().extract({
+        destination_account_id: account.id,
         origin_account_id: account.id
       })
 
       const transactions = []
 
-      for(let i = 0; i < transactionOrigin.length; i++) {
+      for(let i = 0; i < transactionExtract.length; i++) {
         transactions.push({
-          transactionId: transactionOrigin[0].id,
-          date: transactionOrigin[0].date,
-          value: transactionOrigin[0].value,
-          type: transactionOrigin[0].type,
-        })
-      }
-
-      for(let i = 0; i < transactionDestination.length; i++) {
-        transactions.push({
-          transactionId: transactionDestination[0].id,
-          date: transactionDestination[0].date,
-          value: transactionDestination[0].value,
-          type: transactionDestination[0].type,
+          transactionId: transactionExtract[i].id,
+          date: transactionExtract[i].date,
+          value: transactionExtract[i].value,
+          type: transactionExtract[i].type,
         })
       }
 
@@ -88,7 +76,7 @@ class GetExtractService {
       throw new ExceptionTreatment(
         error as Error,
         500,
-        'an error occurred while inserting user on database',
+        'an error occurred while get extract!',
       );
     }
   }

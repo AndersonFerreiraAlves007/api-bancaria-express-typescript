@@ -21,7 +21,7 @@ class TransactionsTable extends PostgresDB {
           $4,
           $5,
           $6
-        ) RETURNING id
+        ) RETURNING *
     `;
 
       const result = await this.client.query(insertTransactionQuery, [
@@ -60,6 +60,50 @@ class TransactionsTable extends PostgresDB {
       }
 
       const query = `SELECT * FROM transactions${conditions.length > 0 ? ` WHERE ${conditions.join(' AND ')}` : ''}`;
+      let result;
+
+      if (values.length > 0) {
+        result = await this.client.query(query, values);
+      } else {
+        result = await this.client.query(query);
+      }
+
+      this.client.end();
+
+      const transactions: Transaction[] = [];
+
+      for (let i = 0; i < result.rows.length; i += 1) {
+        transactions.push({
+          id: result.rows[i].id,
+          date: result.rows[i].date,
+          type: result.rows[i].type,
+          value: result.rows[i].value,
+          origin_account_id: result.rows[i].origin_account_id,
+          destination_account_id: result.rows[i].destination_account_id,
+        });
+      }
+
+      return transactions;
+    } catch (error) {
+      this.client.end();
+      throw new Error('503: service temporarily unavailable');
+    }
+  }
+
+  public async extract(filters: Partial<Transaction>): Promise<Transaction[]> {
+    try {
+      this.client.connect();
+
+      const keys = Object.entries(filters);
+      const conditions = [];
+      const values = [];
+
+      for (let i = 0; i < keys.length; i += 1) {
+        conditions.push(`${keys[i][0]}=$${i + 1}`);
+        values.push(keys[i][1]);
+      }
+
+      const query = `SELECT * FROM transactions${conditions.length > 0 ? ` WHERE ${conditions.join(' OR ')}` : ''}`;
       let result;
 
       if (values.length > 0) {

@@ -21,7 +21,7 @@ class UsersTable extends PostgresDB {
           $4,
           $5,
           $6
-        ) RETURNING id
+        ) RETURNING *
     `;
 
       const result = await this.client.query(insertUserQuery, [

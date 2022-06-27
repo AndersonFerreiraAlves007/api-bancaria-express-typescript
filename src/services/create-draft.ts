@@ -39,12 +39,16 @@ class CreateDraftService {
 
       const account = accountList[0]
 
+      if (Number(account.balance) < (validUserData.transaction.value || 0) + RATE_DRAFT) {
+        throw new Error(`Saldo Insuficiente!`);
+      }
+
       const deposit = await new this.transactionsTable().insert({
         date: new Date(),
         destination_account_id: account.id,
         origin_account_id: null,
         type: validUserData.transaction.type || '',
-        value: validUserData.transaction.value || 0,
+        value: Number(validUserData.transaction.value || 0),
         id: v4()
       })
 
@@ -53,12 +57,12 @@ class CreateDraftService {
         destination_account_id: account.id,
         origin_account_id: null,
         type: TYPE_TRANSACTION_DRAFIT,
-        value: (validUserData.transaction.value || 0) + RATE_DRAFT,
+        value: Number(RATE_DRAFT),
         id: v4()
       })
 
       await new this.accountsTable().update({
-        balance: account.balance +  (validUserData.transaction.value || 0) + RATE_DRAFT
+        balance: Number(Number(account.balance) - (validUserData.transaction.value || 0) + RATE_DRAFT)
       }, account.id)
 
       const responseData:DraftResponse = {
@@ -85,7 +89,7 @@ class CreateDraftService {
       throw new ExceptionTreatment(
         error as Error,
         500,
-        'an error occurred while inserting user on database',
+        'an error occurred while inserting draft on database',
       );
     }
   }
