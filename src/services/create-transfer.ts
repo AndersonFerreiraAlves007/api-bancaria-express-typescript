@@ -32,7 +32,7 @@ class CreateTransferService {
       const originUserList = await new this.usersTable().list(validUserData.originUser)
 
       if (originUserList.length < 0) {
-        throw new Error(`Usuário não cadastrado!!`);
+        throw new Error(`400: Usuário não cadastrado!!`);
       }
 
       const originUser = originUserList[0]
@@ -40,7 +40,7 @@ class CreateTransferService {
       const destinationUserList = await new this.usersTable().list(validUserData.destinationUser)
 
       if (destinationUserList.length < 0) {
-        throw new Error(`Usuário não cadastrado!!`);
+        throw new Error(`400: Usuário não cadastrado!!`);
       }
 
       const destinationUser = destinationUserList[0]
@@ -48,7 +48,7 @@ class CreateTransferService {
       const originAccountList = await new this.accountsTable().list(validUserData.originAccount)
 
       if (originAccountList.length < 0) {
-        throw new Error(`Conta não cadastrada!`);
+        throw new Error(`400: Conta de origin não cadastrada!`);
       }
 
       const originAccount = originAccountList[0]
@@ -56,13 +56,13 @@ class CreateTransferService {
       const destinationAccountList = await new this.accountsTable().list(validUserData.destinationAccount)
 
       if (destinationAccountList.length < 0) {
-        throw new Error(`Conta não cadastrada!`);
+        throw new Error(`400: Conta de destino não cadastrada!`);
       }
 
       const destinationAccount = destinationAccountList[0]
 
       if (Number(originAccount.balance) < (validUserData.transaction.value || 0) + RATE_TRANSFER) {
-        throw new Error(`Saldo Insuficiente!`);
+        throw new Error(`400: Saldo Insuficiente!`);
       }
 
       const transfer = await new this.transactionsTable().insert({

@@ -33,7 +33,7 @@ class CreateDepositService {
       const userList = await new this.usersTable().list(validUserData.user)
 
       if (userList.length < 0) {
-        throw new Error(`Usuário não cadastrado!`);
+        throw new Error(`400: Usuário não cadastrado!`);
       }
 
       const user = userList[0]
@@ -41,7 +41,7 @@ class CreateDepositService {
       const accountList = await new this.accountsTable().list(validUserData.account)
 
       if (accountList.length < 0) {
-        throw new Error(`Conta não cadastrada!`);
+        throw new Error(`400: Conta não cadastrada!`);
       }
 
       const account = accountList[0]
