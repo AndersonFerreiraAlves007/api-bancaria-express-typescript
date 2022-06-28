@@ -5,7 +5,8 @@ import {
   TYPE_TRANSACTION_DEPOSIT, 
   TYPE_TRANSACTION_DRAFIT,
   RATE_DEPOSIT,
-  RATE_DRAFT
+  RATE_DRAFT,
+  TYPE_TRANSACTION_DEPOSIT_RATE
 } from '../utils';
 import { DepositDataValidator } from '../validators';
 import { AccountsTable } from '../clients/dao/postgres/accounts';
@@ -45,16 +46,12 @@ class CreateDepositService {
 
       const account = accountList[0]
 
-      /* if (Number(account.balance) < (validUserData.transaction.value || 0) * (1 + RATE_DEPOSIT)) {
-        throw new Error(`Saldo Insuficiente!`);
-      } */
-
       const deposit = await new this.transactionsTable().insert({
         date: new Date(),
         destination_account_id: account.id,
         origin_account_id: null,
         type: validUserData.transaction.type || '',
-        value: Number(validUserData.transaction.value || 0),
+        value: Number(validUserData.transaction.value || 0) * (1 - RATE_DEPOSIT),
         id: v4()
       })
 
@@ -62,13 +59,13 @@ class CreateDepositService {
         date: new Date(),
         destination_account_id: account.id,
         origin_account_id: null,
-        type: TYPE_TRANSACTION_DRAFIT,
+        type: TYPE_TRANSACTION_DEPOSIT_RATE,
         value: Number((validUserData.transaction.value || 0) * RATE_DEPOSIT),
         id: v4()
       })
 
       await new this.accountsTable().update({
-        balance: Number(Number(account.balance) +  (validUserData.transaction.value || 0) * (1 + RATE_DEPOSIT))
+        balance: Number(Number(account.balance) +  (validUserData.transaction.value || 0))
       }, account.id)
 
       const responseData:DepositResponse = {

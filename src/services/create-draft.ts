@@ -1,6 +1,12 @@
 import { v4 } from 'uuid';
 import { APIResponse, DraftBody, DraftResponse } from '../models';
-import { ExceptionTreatment, TYPE_TRANSACTION_DEPOSIT, TYPE_TRANSACTION_DRAFIT, RATE_DRAFT } from '../utils';
+import { 
+  ExceptionTreatment, 
+  TYPE_TRANSACTION_DEPOSIT, 
+  TYPE_TRANSACTION_DRAFIT, 
+  RATE_DRAFT,
+  TYPE_TRANSACTION_DRAFIT_RATE 
+} from '../utils';
 import { DrafitDataValidator } from '../validators';
 import { AccountsTable } from '../clients/dao/postgres/accounts';
 import { TransactionsTable } from '../clients/dao/postgres/transactions';
@@ -56,7 +62,7 @@ class CreateDraftService {
         date: new Date(),
         destination_account_id: account.id,
         origin_account_id: null,
-        type: TYPE_TRANSACTION_DRAFIT,
+        type: TYPE_TRANSACTION_DRAFIT_RATE,
         value: Number(RATE_DRAFT),
         id: v4()
       })

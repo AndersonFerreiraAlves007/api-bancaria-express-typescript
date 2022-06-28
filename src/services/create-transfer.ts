@@ -1,6 +1,12 @@
 import { v4 } from 'uuid';
 import { APIResponse, TransferBody, TransferResponse } from '../models';
-import { ExceptionTreatment, TYPE_TRANSACTION_TRANSFER, RATE_TRANSFER, TYPE_TRANSACTION_DRAFIT } from '../utils';
+import { 
+  ExceptionTreatment, 
+  TYPE_TRANSACTION_TRANSFER, 
+  RATE_TRANSFER, 
+  TYPE_TRANSACTION_DRAFIT,
+  TYPE_TRANSACTION_TRANSFER_RATE 
+} from '../utils';
 import { TransferDataValidator } from '../validators';
 import { AccountsTable } from '../clients/dao/postgres/accounts';
 import { TransactionsTable } from '../clients/dao/postgres/transactions';
@@ -72,7 +78,7 @@ class CreateTransferService {
         date: new Date(),
         destination_account_id: originAccount.id,
         origin_account_id: null,
-        type: TYPE_TRANSACTION_DRAFIT,
+        type: TYPE_TRANSACTION_TRANSFER_RATE,
         value: Number(RATE_TRANSFER),
         id: v4()
       })

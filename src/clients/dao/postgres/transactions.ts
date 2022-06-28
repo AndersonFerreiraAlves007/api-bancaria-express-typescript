@@ -103,7 +103,7 @@ class TransactionsTable extends PostgresDB {
         values.push(keys[i][1]);
       }
 
-      const query = `SELECT * FROM transactions${conditions.length > 0 ? ` WHERE ${conditions.join(' OR ')}` : ''}`;
+      const query = `SELECT * FROM transactions${conditions.length > 0 ? ` WHERE ${conditions.join(' OR ')}` : ''} ORDER BY date DESC`;
       let result;
 
       if (values.length > 0) {
