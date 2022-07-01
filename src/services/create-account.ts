@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 import { APIResponse, AccountBody, AccountResponse, User } from '../models';
-import { ExceptionTreatment, generateAccount } from '../utils';
+import { ExceptionTreatment, generateAccount, cryptPassword } from '../utils';
 import { AccountDataValidator } from '../validators';
 import { AccountsTable } from '../clients/dao/postgres/accounts';
 import { UsersTable } from '../clients/dao/postgres/users';
@@ -43,7 +43,8 @@ class CreateAccountService {
           agency_verification_code: accountBody.account_verification_code || '',
           balance: 0,
           id: v4(),
-          user_id: user.id
+          user_id: user.id,
+          password: await cryptPassword(accountBody.password || '')
         });
 
         const responseData: AccountResponse = {

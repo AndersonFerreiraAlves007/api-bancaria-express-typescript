@@ -5,7 +5,8 @@ import {
   TYPE_TRANSACTION_DEPOSIT, 
   TYPE_TRANSACTION_DRAFIT, 
   RATE_DRAFT,
-  TYPE_TRANSACTION_DRAFIT_RATE 
+  TYPE_TRANSACTION_DRAFIT_RATE,
+  autorizationOperation 
 } from '../utils';
 import { DrafitDataValidator } from '../validators';
 import { AccountsTable } from '../clients/dao/postgres/accounts';
@@ -47,6 +48,10 @@ class CreateDraftService {
 
       if (Number(account.balance) < (validUserData.transaction.value || 0) + RATE_DRAFT) {
         throw new Error(`400: Saldo Insuficiente!`);
+      }
+
+      if(!(await autorizationOperation(validUserData.account.password || '', account.password))) {
+        throw new Error(`400: Você não possui autorização para fazer esta operação!`);
       }
 
       const deposit = await new this.transactionsTable().insert({

@@ -4,6 +4,7 @@ import {
   DocumentValidator,
   VerificationCodeValidator,
   ValueValidator,
+  PasswordValidator
 } from '.';
 import {
   User, Account, DepositBody, Transaction,
@@ -29,6 +30,8 @@ class DepositDataValidator {
 
   private valueValidator = ValueValidator;
 
+  private passwordValidator = PasswordValidator;
+
   public constructor(body: DepositBody) {
     this.errors = '';
     const { user, account, transaction } = this.validate(body);
@@ -43,9 +46,10 @@ class DepositDataValidator {
     const validAccountNumber = new this.accountNumberValidator(body.account.accountNumber);
     const validAccountVerificationCode = new this.verificationCodeValidator(body.account.accountVerificationCode);
     const validDocument = new this.documentValidator(body.account.document);
+    const validPassword = new this.passwordValidator(body.account.accountPassword);
     const validValue = new this.valueValidator(body.value);
 
-    this.errors = this.errors.concat(`${validAgencyNumber.errors}${validAgencyVerificationCode.errors}${validAccountNumber.errors}${validAccountVerificationCode.errors}${validDocument.errors}${validValue.errors}`);
+    this.errors = this.errors.concat(`${validAgencyNumber.errors}${validAgencyVerificationCode.errors}${validAccountNumber.errors}${validAccountVerificationCode.errors}${validDocument.errors}${validValue.errors}${validPassword.errors}`);
 
     return {
       user: {
@@ -56,6 +60,7 @@ class DepositDataValidator {
         agency_number: validAgencyNumber.agencyNumber,
         account_verification_code: validAccountVerificationCode.verificationCode,
         agency_verification_code: validAgencyVerificationCode.verificationCode,
+        password: validPassword.password
       },
       transaction: {
         date: new Date(),

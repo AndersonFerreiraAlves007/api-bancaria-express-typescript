@@ -14,7 +14,8 @@ class AccountsTable extends PostgresDB {
           account_number,
           account_verification_code,
           balance,
-          user_id
+          user_id,
+          password
         ) VALUES (
           $1,
           $2,
@@ -22,7 +23,8 @@ class AccountsTable extends PostgresDB {
           $4,
           $5,
           $6,
-          $7
+          $7,
+          $8
         ) RETURNING *
       `;
 
@@ -34,6 +36,7 @@ class AccountsTable extends PostgresDB {
         account.account_verification_code,
         account.balance,
         account.user_id,
+        account.password
       ]);
 
       this.client.end();
@@ -113,6 +116,7 @@ class AccountsTable extends PostgresDB {
           agency_verification_code: result.rows[i].agency_verification_code,
           balance: result.rows[i].balance,
           user_id: result.rows[i].user_id,
+          password: result.rows[i].password,
         });
       }
 

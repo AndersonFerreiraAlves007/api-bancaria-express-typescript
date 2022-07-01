@@ -1,5 +1,5 @@
 class DateValidator {
-  public date: string;
+  public date: Date;
 
   public errors: string;
 
@@ -8,20 +8,20 @@ class DateValidator {
     this.date = this.validate(date);
   }
 
-  private validate(date: string): string {
+  private validate(date: string): Date {
     if (!date) {
       this.errors += 'birthdate:birthdate required';
 
-      return '';
+      return new Date();
     }
 
     if (!new Date(date).getTime()) {
       this.errors += 'birthdate:invalid date|';
 
-      return '';
+      return new Date();
     }
 
-    return date.trim();
+    return new Date(date);
   }
 }
 

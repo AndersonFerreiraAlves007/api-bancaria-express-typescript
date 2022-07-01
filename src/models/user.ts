@@ -5,7 +5,6 @@ interface User
   email: string
   birthdate: Date
   document: string
-  password: string
 }
 
 export { User };

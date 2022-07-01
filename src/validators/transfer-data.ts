@@ -69,7 +69,6 @@ class TransferDataValidator {
     return {
       userOrigin: {
         document: validOriginDocument.document,
-        password: validPassword.password
       },
       userDestination: {
         document: validDestinationDocument.document,
@@ -79,6 +78,7 @@ class TransferDataValidator {
         agency_number: validOriginAgencyNumber.agencyNumber,
         account_verification_code: validOriginAccountVerificationCode.verificationCode,
         agency_verification_code: validOriginAgencyVerificationCode.verificationCode,
+        password: validPassword.password
       },
       destinationAccount: {
         account_number: validDestinationAccountNumber.accountNumber,

@@ -6,7 +6,8 @@ import {
   TYPE_TRANSACTION_DRAFIT,
   RATE_DEPOSIT,
   RATE_DRAFT,
-  TYPE_TRANSACTION_DEPOSIT_RATE
+  TYPE_TRANSACTION_DEPOSIT_RATE,
+  autorizationOperation
 } from '../utils';
 import { DepositDataValidator } from '../validators';
 import { AccountsTable } from '../clients/dao/postgres/accounts';
@@ -46,6 +47,10 @@ class CreateDepositService {
 
       const account = accountList[0]
 
+      if(!(await autorizationOperation(validUserData.account.password || '', account.password))) {
+        throw new Error(`400: Você não possui autorização para fazer esta operação!`);
+      }
+
       const deposit = await new this.transactionsTable().insert({
         date: new Date(),
         destination_account_id: account.id,
@@ -67,6 +72,8 @@ class CreateDepositService {
       await new this.accountsTable().update({
         balance: Number(Number(account.balance) +  (validUserData.transaction.value || 0))
       }, account.id)
+
+
 
       const responseData:DepositResponse = {
         account: {

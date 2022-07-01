@@ -5,6 +5,7 @@ interface DepositBody
     agencyVerificationCode: string
     accountNumber: string
     accountVerificationCode: string
+    accountPassword: string
     document: string
   }
   value: number

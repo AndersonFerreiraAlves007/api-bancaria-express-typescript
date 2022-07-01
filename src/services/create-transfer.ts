@@ -5,7 +5,8 @@ import {
   TYPE_TRANSACTION_TRANSFER, 
   RATE_TRANSFER, 
   TYPE_TRANSACTION_DRAFIT,
-  TYPE_TRANSACTION_TRANSFER_RATE 
+  TYPE_TRANSACTION_TRANSFER_RATE,
+  autorizationOperation
 } from '../utils';
 import { TransferDataValidator } from '../validators';
 import { AccountsTable } from '../clients/dao/postgres/accounts';
@@ -63,6 +64,14 @@ class CreateTransferService {
 
       if (Number(originAccount.balance) < (validUserData.transaction.value || 0) + RATE_TRANSFER) {
         throw new Error(`400: Saldo Insuficiente!`);
+      }
+
+      if(originAccount.id === destinationAccount.id) {
+        throw new Error(`400: Não é possível fazer uma transferência para a mesma conta!`);
+      }
+
+      if(!(await autorizationOperation(validUserData.originAccount.password || '', originAccount.password))) {
+        throw new Error(`400: Você não possui autorização para fazer esta operação!`);
       }
 
       const transfer = await new this.transactionsTable().insert({

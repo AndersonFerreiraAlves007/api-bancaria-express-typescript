@@ -45,11 +45,11 @@ API Bancária com Typescript:
         ✔ create-transfer @done(22-06-25 20:58)
         ✔ create-draft @done(22-06-25 20:58)
       services:
-        ☐ create-account
-        ☐ get-extract
-        ☐ create-deposit
-        ☐ create-transfer
-        ☐ create-draft
+        ✔ create-account @done(22-07-01 17:29)
+        ✔ get-extract @done(22-07-01 17:30)
+        ✔ create-deposit @done(22-07-01 17:30)
+        ✔ create-transfer @done(22-07-01 17:30)
+        ✔ create-draft @done(22-07-01 17:30)
       validators:
         user:
           ✔ name @done(22-06-25 20:58)

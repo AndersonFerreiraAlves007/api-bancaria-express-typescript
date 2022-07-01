@@ -5,7 +5,6 @@ CREATE TABLE public.users (
 	"name" varchar(80) NOT NULL,
 	"document" varchar(11) NOT NULL,
 	"birthdate" DATE NOT NULL,
-	"password" varchar(10) NOT NULL,
 	"email" varchar(256) NOT NULL,
 	CONSTRAINT "users_pk" PRIMARY KEY ("id")
 ) WITH (
@@ -18,7 +17,7 @@ CREATE TABLE public.transactions (
 	"value" DECIMAL(11,2) NOT NULL,
 	"type" varchar(10) NOT NULL,
 	"origin_account_id" varchar(40),
-	"destination_account_id" varchar(40),
+	"destination_account_id" varchar(40)
 	CONSTRAINT "transactions_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -32,6 +31,7 @@ CREATE TABLE public.accounts (
 	"account_verification_code" varchar(1) NOT NULL,
 	"balance" DECIMAL(11,2) NOT NULL,
 	"user_id" varchar(40) NOT NULL,
+	"password" varchar(100) NOT NULL
 	CONSTRAINT "accounts_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE

@@ -54,13 +54,13 @@ class DrafitDataValidator {
     return {
       user: {
         document: validDocument.document,
-        password: validPassword.password
       },
       account: {
         account_number: validAccountNumber.accountNumber,
         agency_number: validAgencyNumber.agencyNumber,
         account_verification_code: validAccountVerificationCode.verificationCode,
         agency_verification_code: validAgencyVerificationCode.verificationCode,
+        password: validPassword.password
       },
       transaction: {
         date: new Date(),
