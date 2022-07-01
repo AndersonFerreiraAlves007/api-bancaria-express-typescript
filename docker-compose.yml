@@ -1,6 +1,18 @@
 version: '3.9'
 
 services:
+  backend:
+    build: .
+    restart: always
+    ports:
+      - 3333:3333
+    environment:
+      SERVER_PORT: 3333
+      DATABASE_NAME: api_bancaria_db
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: '58310502'
+      DATABASE_HOST: localhost
   postgresql:
     image: postgres
     restart: always
